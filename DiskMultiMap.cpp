@@ -64,12 +64,15 @@ MultiMapTuple DiskMultiMap::Iterator::operator*()
     BinaryFile iterBF;
     iterBF.openExisting(m_file);
     
+    /*
     Bucket b;
     iterBF.read(b, m_bucketLoc);
     k = b.key;
+    */
     
     Association currentAsso;
     iterBF.read(currentAsso, cur);
+    k = currentAsso.key;
     v = currentAsso.value;
     c = currentAsso.context;
     
@@ -112,7 +115,7 @@ bool DiskMultiMap::createNew(const std::string& filename, unsigned int numBucket
     for(int i = 0; i < numBuckets; i++)
     {
         DiskMultiMap::Bucket b;
-        strcpy(b.key, "");
+        //strcpy(b.key, "");
         b.used = false;
         b.head = bf.fileLength();   //points to itself
         
@@ -145,6 +148,7 @@ bool DiskMultiMap::insert(const std::string& key, const std::string& value, cons
     
         //create the association
     Association a;
+        strcpy(a.key, key.c_str());
         strcpy(a.value, value.c_str());
         strcpy(a.context, context.c_str());
     
@@ -166,8 +170,6 @@ bool DiskMultiMap::insert(const std::string& key, const std::string& value, cons
         h.headToDeleted = reuse.next;
         
     }
-        //write association
-    //bf.write(a, availOffset);
 
         //find hash value for the bucket
     unsigned int bucketLoc = findHashValue(key);
@@ -178,7 +180,6 @@ bool DiskMultiMap::insert(const std::string& key, const std::string& value, cons
     
     if(!b.used)
     {
-        strcpy(b.key, key.c_str());
         b.used = true;
         b.head = availOffset;
         
@@ -190,7 +191,7 @@ bool DiskMultiMap::insert(const std::string& key, const std::string& value, cons
         b.head = availOffset;
     }
     
-    //write association
+    //write association and bucket
     bf.write(b, bucketLoc);
     bf.write(a, availOffset);
     return true;
@@ -208,6 +209,13 @@ DiskMultiMap::Iterator DiskMultiMap::search(const std::string& key)
     {
         BinaryFile::Offset firstAsso = b.head;
         DiskMultiMap::Iterator it(m_fileName, firstAsso, findHashValue(key));
+        while(it.isValid())
+        {
+            if((*it).key != key)
+                ++it;
+            else
+                break;
+        }
         return it;
     }
     else

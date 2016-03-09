@@ -59,13 +59,14 @@ private:
     
     struct Bucket
     {
-        char key[120+1];
+        //char key[120+1];
         bool used;
         BinaryFile::Offset head;
     };
     
     struct Association
     {
+        char key[120+1];
         char value[120+1];
         char context[120+1];
         BinaryFile::Offset next;
