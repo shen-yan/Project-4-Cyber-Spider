@@ -2,9 +2,12 @@
 #define INTELWEB_H_
 
 #include "InteractionTuple.h"
+#include "DiskMultiMap.h"
 #include <string>
 #include <vector>
 
+
+class DiskMultiMap;
 class IntelWeb
 {
 public:
@@ -23,6 +26,13 @@ public:
     
 private:
     // Your private member declarations will go here
+    DiskMultiMap m_disk;
+    DiskMultiMap m_disk2;
+    
+    string m_fileName;
+    
+    
+    
 };
 
 #endif // INTELWEB_H_
